@@ -22,7 +22,7 @@
 #include "LCD_ST7735R.h"
 #include "gui.h"
 #include "UART.h"
-
+#include "HT1621.h"
 /*****************************************************************************
  Define
 ******************************************************************************/
@@ -81,12 +81,38 @@ BOOL SECLICK = FALSE;
 static UART_HANDLE g_UartHandle;
 volatile char g_UART_CharRx;
 
+// HT1621
+static HT1621 g_HT1621;
+static volatile uint16_t n = 0, nn = 0;
+static BOOL g_bHT1621Update = FALSE;
+
+/* Initializes the HT1621 LCD display   					*/
+/* and blanks all the characters.	     						*/
+static void main_HT1621Init(void)
+{
+	uint8_t i;
+
+	HT1621_Command(&g_HT1621, CMD_SYS_EN);
+	HT1621_Command(&g_HT1621, CMD_RC_256K);
+	HT1621_Command(&g_HT1621, CMD_BIAS3_COM4);
+	HT1621_Command(&g_HT1621, CMD_LCD_ON);
+
+	// blanks LCD screen
+	for (i = 1; i <= 6; i++)
+		HT1621_Write_Digit(&g_HT1621, i, 10); // digit, number to display
+}
+
+
 /*****************************************************************************
  Local Functions
 ******************************************************************************/
 static void main_LcdInit(void);
 static void main_KeyScan(void);
 static void main_KeypadOutput(void);
+
+static void main_LcdInit(void);
+static void main_HT1621Init(void);
+void buzzer_on_ms(int);
 
 /*****************************************************************************
  Implementation
@@ -110,6 +136,8 @@ int main()
 
 	main_LcdInit();
 	IRQ_Init();
+
+	main_HT1621Init();
 
 	for (;;)
 	{
