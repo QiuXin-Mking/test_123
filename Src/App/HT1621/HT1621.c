@@ -1,22 +1,6 @@
 #include "HT1621.h"
 
 
-/* Initializes the HT1621 LCD display   					*/
-/* and blanks all the characters.	     						*/
-static void main_HT1621Init(void)
-{
-	uint8_t i;
-
-	HT1621_Command(&g_HT1621, CMD_SYS_EN);
-	HT1621_Command(&g_HT1621, CMD_RC_256K);
-	HT1621_Command(&g_HT1621, CMD_BIAS3_COM4);
-	HT1621_Command(&g_HT1621, CMD_LCD_ON);
-
-	// blanks LCD screen
-	for (i = 1; i <= 6; i++)
-		HT1621_Write_Digit(&g_HT1621, i, 10); // digit, number to display
-}
-
 
 /*Command Mode: Command Code = 100  */	
 
