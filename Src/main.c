@@ -86,6 +86,9 @@ static HT1621 g_HT1621;
 static volatile uint16_t n = 0, nn = 0;
 static BOOL g_bHT1621Update = FALSE;
 
+/* SysTick   */
+static volatile BOOL g_bSystemTick = FALSE;
+static volatile BOOL g_bSystemTick1000 = FALSE; /* flag changes after 1000 ms */
 /* Initializes the HT1621 LCD display   					*/
 /* and blanks all the characters.	     						*/
 static void main_HT1621Init(void)
@@ -141,6 +144,39 @@ int main()
 
 	for (;;)
 	{
+
+		// update clock variables every sec
+		if (FALSE != g_bSystemTick1000)
+		{
+			g_bSystemTick1000 = FALSE;
+			sec = g_nTimeSec % 60;
+			min = (g_nTimeSec / 60) % 60;
+			hr = (g_nTimeSec / 3600) % 24;
+			g_bHT1621Update = TRUE;
+		}
+
+
+		// update HT1621 LCd display
+		if (g_bHT1621Update == TRUE)
+		{
+			g_bHT1621Update = FALSE;
+			g_bToggle ^= BIT(0);
+
+			HT1621_Write_Digit(&g_HT1621, 5, (hr / 10) % 10);  // digit 5
+			HT1621_Write_Digit(&g_HT1621, 4, hr % 10);		   // digit 4
+			HT1621_Write_Digit(&g_HT1621, 3, (min / 10) % 10); // digit 3
+			HT1621_Write_Digit(&g_HT1621, 2, min % 10);		   // digit 2
+
+			if (TRUE == g_bToggle)
+				HT1621_Write_Dot(&g_HT1621, 3, 1); // (dot_num, ON/OFF) - 1=ON,0=OFF
+			else
+				HT1621_Write_Dot(&g_HT1621, 3, 0);
+
+			if (sec == 0)
+				buzzer_on_ms(5);
+		} /* g_bHT1621Update */
+
+		
 		/* LCD update */
 		if (FALSE != g_bLCDUpdate)
 		{
@@ -171,6 +207,18 @@ void SysTick_Handler(void)
 
 	/* Provide system tick */
 	g_nCount++;
+
+	if (g_nCount % 1000 == 0) // 1000 ms
+	{
+		g_bSystemTick1000 = TRUE;
+
+		/* Keep track of time based on 1 sec interval */
+		g_nTimeSec++;
+		if (g_nTimeSec > 24 * 60 * 60)
+		{
+			g_nTimeSec = 0;
+		}
+	} // g_nCount
 
 	if (BUZZER == TRUE)
 	{
