@@ -86,8 +86,12 @@ static HT1621 g_HT1621;
 static volatile uint16_t n = 0, nn = 0;
 static BOOL g_bHT1621Update = FALSE;
 
+// clock variables
+static uint16_t min = 0;
+static uint16_t hr = 0;
+static uint16_t sec = 0;
+
 /* SysTick   */
-static volatile BOOL g_bSystemTick = FALSE;
 static volatile BOOL g_bSystemTick1000 = FALSE; /* flag changes after 1000 ms */
 /* Initializes the HT1621 LCD display   					*/
 /* and blanks all the characters.	     						*/
