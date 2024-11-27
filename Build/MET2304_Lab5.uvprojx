@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\Src\BSP;..\Src\BSP\MCU;..\Src\BSP\SPI;..\Src\App\LCD;..\Src\App\LED;..\Lib\Inc</IncludePath>
+              <IncludePath>..\Src\BSP;..\Src\BSP\MCU;..\Src\BSP\SPI;..\Src\App\LCD;..\Src\App\LED;..\Lib\Inc;..\Src\App\HT1621</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -398,6 +398,11 @@
               <FileName>LED.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Src\App\LED\LED.h</FilePath>
+            </File>
+            <File>
+              <FileName>HT1621.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\App\HT1621\HT1621.c</FilePath>
             </File>
           </Files>
         </Group>

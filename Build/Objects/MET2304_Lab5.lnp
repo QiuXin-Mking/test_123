@@ -1,5 +1,6 @@
 --cpu=Cortex-M4.fp.sp
 ".\objects\main.o"
+".\objects\ht1621.o"
 "..\Src\App\LCD\DPGUI_KEIL_CM4_V11.lib"
 ".\objects\lcd_st7735r.o"
 ".\objects\fontarialbold16.o"
