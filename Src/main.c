@@ -121,6 +121,12 @@ static void main_LcdInit(void);
 static void main_HT1621Init(void);
 void buzzer_on_ms(int);
 
+void buzzer_on_ms(int ms)
+{
+	g_nBuzzerCountDn_ms = ms;
+	BUZZER_ON();
+}
+
 /*****************************************************************************
  Implementation
 ******************************************************************************/
