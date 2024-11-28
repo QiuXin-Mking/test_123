@@ -46,6 +46,10 @@
 #define PD_KEYPAD_ROW2		2U
 #define PD_KEYPAD_ROW3		3U
 
+#define PC4_HT1621_CS			4U
+#define PC5_HT1621_WR			5U
+#define PC6_HT1621_DATA		6U
+
 #define PE_IR_INPUT				0U
 #define PE_KEYPAD_COL0		1U
 #define PE_KEYPAD_COL1		2U

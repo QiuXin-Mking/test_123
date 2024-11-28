@@ -509,6 +509,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\BSP\retarget.c</FilePath>
             </File>
+            <File>
+              <FileName>Timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\BSP\Timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

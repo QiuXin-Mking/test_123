@@ -23,6 +23,7 @@
 #include "gui.h"
 #include "UART.h"
 #include "HT1621.h"
+#include "Timer.h"
 /*****************************************************************************
  Define
 ******************************************************************************/
@@ -88,6 +89,13 @@ static HT1621 g_HT1621;
 static volatile uint16_t n = 0, nn = 0;
 static BOOL g_bHT1621Update = FALSE;
 
+//Timer
+static TIMER_HANDLE		g_Timer0AHandle;
+volatile BOOL					g_bTimer0AISRDone = FALSE;
+
+// buz
+static volatile uint32_t g_nBuzzerCountDn_ms;
+
 // clock variables
 static uint16_t min = 0;
 static uint16_t hr = 0;
@@ -125,8 +133,13 @@ void buzzer_on_ms(int);
 void buzzer_on_ms(int ms)
 {
 	g_nBuzzerCountDn_ms = ms;
-	BUZZER_ON();
+	// BUZZER_ON();
 }
+
+/*****************************************************************************
+ Callback Functions
+******************************************************************************/
+static void main_cbTimer0A( void );
 
 /*****************************************************************************
  Implementation
@@ -148,6 +161,14 @@ int main()
 		SPI_CLK_RISING_EDGE,
 		SPI_DATA_SIZE_8);
 
+	/* initialize timer 0A  */
+	g_Timer0AHandle.nTimer = TIMER0_A;
+	g_Timer0AHandle.nFreq = 150000;
+	g_Timer0AHandle.bIs32Bit = FALSE; // set timer to 16-bit mode
+	g_Timer0AHandle.pfUpdate = main_cbTimer0A;
+	TimerInit( &g_Timer0AHandle);
+	delay_ms(100);
+
 	main_LcdInit();
 	IRQ_Init();
 
@@ -164,63 +185,53 @@ int main()
 	printf("Have a good lab session.\n\r");
 
 	LED_RGB_SET(RGB_OFF);
-	delay_ms(1000);
+	delay_ms(50);
 	LED_RGB_SET(RGB_RED);
-	delay_ms(1000);
+	delay_ms(50);
 	LED_RGB_SET(RGB_GREEN);
-	delay_ms(1000);
+	delay_ms(50);
 	LED_RGB_SET(RGB_BLUE);
-	delay_ms(1000);
+	delay_ms(50);
 	LED_RGB_SET(RGB_MAGENTA);
-	delay_ms(1000);
+	delay_ms(50);
 	LED_RGB_SET(RGB_YELLOW);
-	delay_ms(1000);
+	delay_ms(50);
 	LED_RGB_SET(RGB_CYAN);
-	delay_ms(1000);
+	delay_ms(50);
 	LED_RGB_SET(RGB_WHITE);
-	delay_ms(1000);
-
-
-	LED_RGB_SET(RGB_OFF);
-	delay_ms(1000);
-	LED_RGB_SET(RGB_RED);
-	delay_ms(1000);
-	LED_RGB_SET(RGB_GREEN);
-	delay_ms(1000);
-	LED_RGB_SET(RGB_BLUE);
-	delay_ms(1000);
-	LED_RGB_SET(RGB_MAGENTA);
-	delay_ms(1000);
-	LED_RGB_SET(RGB_YELLOW);
-	delay_ms(1000);
-	LED_RGB_SET(RGB_CYAN);
-	delay_ms(1000);
-	LED_RGB_SET(RGB_WHITE);
-	delay_ms(1000);
+	delay_ms(50);
 
 
 	printf("\nHello Buzzer! \n\r"); // display to virtual COM port
 	printf("Have a good lab session.\n\r");
 	
 	BUZZER_ON();
-	delay_ms(1000);
+	delay_ms(50);
 	BUZZER_OFF();
-	delay_ms(1000);
+	delay_ms(50);
 	BUZZER_ON();
-	delay_ms(1000);
+	delay_ms(50);
 	BUZZER_OFF();
-	delay_ms(1000);
+	delay_ms(50);
 	BUZZER_ON();
-	delay_ms(1000);
+	delay_ms(50);
 	BUZZER_OFF();
-	delay_ms(1000);
+	delay_ms(50);
 	BUZZER_ON();
-	delay_ms(1000);
+	delay_ms(50);
 	BUZZER_OFF();
-	delay_ms(1000);
+	delay_ms(50);
 
-
-
+	hr = 1;
+	min = 2;
+	while(1)
+	{
+		printf(" ht1621 \n\r");
+		HT1621_Write_Digit(&g_HT1621, 5, (hr / 10) % 10);  // digit 5
+		HT1621_Write_Digit(&g_HT1621, 4, hr % 10);		   // digit 4
+		HT1621_Write_Digit(&g_HT1621, 3, (min / 10) % 10); // digit 3
+		HT1621_Write_Digit(&g_HT1621, 2, min % 10);		   // digit 2
+	}
 	for (;;)
 	{
 
@@ -383,6 +394,11 @@ static void main_cbGuiFrameEnd(void)
 	g_bLcdFree = TRUE;
 }
 
+static void main_cbTimer0A( void )
+{
+	g_bTimer0AISRDone = TRUE;
+	g_HT1621.cmd_done = TRUE;
+}
 /*****************************************************************************
  Local functions
 ******************************************************************************/
@@ -503,5 +519,41 @@ void GPIOF_Button_IRQHandler(uint32_t Status)
 	if (0 != (Status & BIT(PF_SW2)))
 	{
 		GPIOF->ICR = BIT(PF_SW2);
+	}
+}
+
+#define PERI_BASE						0x40000000  // Cortex-M4 peripheral base addr
+#define GPIOC_DATA					0x400063FC 	// GPIOC data register addr
+#define BITBAND_PERI_BASE   0x42000000 	// start of peripheral bit-band alias region
+#define BITBAND_PERI(addr,bit_no)((BITBAND_PERI_BASE+(addr-PERI_BASE)*32+(bit_no*4)))
+
+// define GPIO port accesses
+#define GPIOC_Bit4 *((volatile unsigned int *)(BITBAND_PERI(GPIOC_DATA,4))) // GPIO PC4
+#define GPIOC_Bit5 *((volatile unsigned int *)(BITBAND_PERI(GPIOC_DATA,5))) // GPIO PC5
+#define GPIOC_Bit6 *((volatile unsigned int *)(BITBAND_PERI(GPIOC_DATA,6))) // GPIO PC6
+
+void main_Timer0A_IRQHandler( uint32_t status )
+{
+	if ( (1ULL << n) & g_HT1621.CS )
+		GPIOC_Bit4 = 1;
+	else
+		GPIOC_Bit4 = 0;
+	
+	if ( (1ULL << n) & g_HT1621.WR )
+		GPIOC_Bit5 = 1;
+	else
+		GPIOC_Bit5 = 0;
+	
+	if ( (1ULL << n) & g_HT1621.DATA )
+		GPIOC_Bit6 = 1;
+	else
+		GPIOC_Bit6 = 0;
+	
+	n++;
+	if (n == (g_HT1621.intr - 1))
+	{
+		n=0; // reset n
+		TIMER0->CTL &= ~TIMER_CTL_TAEN;
+		g_Timer0AHandle.pfUpdate();
 	}
 }

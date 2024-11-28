@@ -121,6 +121,15 @@ void Port_Init( void )
 	
 	GPIOB->DIR |= BIT(PB_LCD_BL);
 	GPIOB->DEN |= BIT(PB_LCD_BL);
+
+
+	/* Configure GPIO pins for HT1621 														*/
+	/* Configure PC4 (CS), PC5 (WR), PC6 (DATA) as output pins 		*/
+	/* All pins to output a H as initial state.										*/
+	GPIOC->AFSEL &= ~(BIT(PC4_HT1621_CS) | BIT(PC5_HT1621_WR) | BIT(PC6_HT1621_DATA));
+	GPIOC->DIR |= BIT(PC4_HT1621_CS) | BIT(PC5_HT1621_WR) | BIT(PC6_HT1621_DATA);
+	GPIOC->DEN |= BIT(PC4_HT1621_CS) | BIT(PC5_HT1621_WR) | BIT(PC6_HT1621_DATA);
+	GPIOC->DATA |= 0x70; // initial state of CS, WR, DATA
 	
 	/* initialize GPIO PA0 (UART0_RX) & PA1 (UART0_TX)   */
 	GPIOA->AFSEL |= BIT(PA_UART0_RX) | BIT(PA_UART0_TX);

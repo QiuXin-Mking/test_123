@@ -1249,9 +1249,9 @@ Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M4.fp.sp
 --depend=.\objects\startup_tm4c123.d -o.\objects\startup_tm4c123.o -I.\RTE\_Deb
 ug -IC:\Users\70971\AppData\Local\Arm\Packs\ARM\CMSIS\6.1.0\CMSIS\Core\Include 
 -IC:\Users\70971\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4
-C123 --predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 540" --pre
-define="TM4C123GH6PM SETA 1" --predefine="_RTE_ SETA 1" --list=.\listings\start
-up_tm4c123.lst ..\Src\BSP\MCU\startup_TM4C123.s
+C123 --predefine="__UVISION_VERSION SETA 540" --predefine="TM4C123GH6PM SETA 1"
+ --predefine="_RTE_ SETA 1" --list=.\listings\startup_tm4c123.lst ..\Src\BSP\MC
+U\startup_TM4C123.s
 
 
 
@@ -2614,4 +2614,4 @@ Symbol: __use_two_region_memory
       None
 Comment: __use_two_region_memory unused
 3 symbols
-475 symbols in table
+474 symbols in table

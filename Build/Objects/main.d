@@ -4,4 +4,4 @@
   ..\Src\BSP\MCU\system_TM4C123.h ..\Src\BSP\Hal.h ..\Src\BSP\BSP.h \
   ..\Src\App\LED\LED.h ..\Src\BSP\IRQ.h ..\Src\BSP\SPI\spim.h \
   ..\Src\App\LCD\LCD_ST7735R.h ..\Src\App\LCD\gui.h ..\Src\BSP\UART.h \
-  ..\Src\App\HT1621\HT1621.h
+  ..\Src\App\HT1621\HT1621.h ..\Src\BSP\Timer.h
