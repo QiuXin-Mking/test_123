@@ -74,6 +74,8 @@ static volatile BOOL g_bLcdFree = TRUE;
 static volatile BOOL g_nKeypadScan = FALSE;
 static volatile int g_nKeypad = KEYPAD_UPDATE_MS;
 static unsigned char g_cKey = '-';
+
+static volatile uint32_t g_nBuzzerCountDn_ms;
 BOOL BUZZER = FALSE;
 BOOL SECLICK = FALSE;
 
@@ -108,7 +110,6 @@ static void main_HT1621Init(void)
 	for (i = 1; i <= 6; i++)
 		HT1621_Write_Digit(&g_HT1621, i, 10); // digit, number to display
 }
-
 
 /*****************************************************************************
  Local Functions
@@ -152,6 +153,74 @@ int main()
 
 	main_HT1621Init();
 
+	g_UartHandle.baud = 9600;
+	g_UartHandle.databits = DATABITS8;
+	g_UartHandle.stop = STOP1;
+	g_UartHandle.parity = PARITY_NONE;
+	UART_Init(UART_0, &g_UartHandle); /// call function to initialize UART0
+
+	/* print to Virtual COM port terminal */
+	printf("\nHello RGB! \n\r"); // display to virtual COM port
+	printf("Have a good lab session.\n\r");
+
+	LED_RGB_SET(RGB_OFF);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_RED);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_GREEN);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_BLUE);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_MAGENTA);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_YELLOW);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_CYAN);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_WHITE);
+	delay_ms(1000);
+
+
+	LED_RGB_SET(RGB_OFF);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_RED);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_GREEN);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_BLUE);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_MAGENTA);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_YELLOW);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_CYAN);
+	delay_ms(1000);
+	LED_RGB_SET(RGB_WHITE);
+	delay_ms(1000);
+
+
+	printf("\nHello Buzzer! \n\r"); // display to virtual COM port
+	printf("Have a good lab session.\n\r");
+	
+	BUZZER_ON();
+	delay_ms(1000);
+	BUZZER_OFF();
+	delay_ms(1000);
+	BUZZER_ON();
+	delay_ms(1000);
+	BUZZER_OFF();
+	delay_ms(1000);
+	BUZZER_ON();
+	delay_ms(1000);
+	BUZZER_OFF();
+	delay_ms(1000);
+	BUZZER_ON();
+	delay_ms(1000);
+	BUZZER_OFF();
+	delay_ms(1000);
+
+
+
 	for (;;)
 	{
 
@@ -164,7 +233,6 @@ int main()
 			hr = (g_nTimeSec / 3600) % 24;
 			g_bHT1621Update = TRUE;
 		}
-
 
 		// update HT1621 LCd display
 		if (g_bHT1621Update == TRUE)
@@ -186,7 +254,6 @@ int main()
 				buzzer_on_ms(5);
 		} /* g_bHT1621Update */
 
-		
 		/* LCD update */
 		if (FALSE != g_bLCDUpdate)
 		{
